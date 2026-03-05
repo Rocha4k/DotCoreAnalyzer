@@ -1,0 +1,17 @@
+{
+  "name": "DotCore Analyzer",
+  "short_name": "DotCore",
+  "description": "Advanced performance, SEO, accessibility and security analysis.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "img/DotCoreV2.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DotCore Analyzer</title>
+    <meta name="description" content="Professional website audit tool — DotCore Analyzer">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=7">
+    <script type="text/javascript" src="/eel.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/jpeg" href="img/DotCoreIcon.jpg?v=7">
+</head>
+
+<body>
+
+
+
+    <div class="app-layout">
+
+        <!-- ══ SIDEBAR ══════════════════════════════════════ -->
+        <nav class="sidebar-nav">
+            <div class="nav-branding">
+                <img src="img/DotCore1600.png?v=5" alt="DotCore">
+            </div>
+            <div class="nav-links hidden" id="main-nav-links">
+                <button class="nav-item active" data-tab="dashboard">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                    </svg>
+                    <span data-i18n="nav_dashboard">Dashboard</span>
+                </button>
+                <button class="nav-item" data-tab="tech-audit">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                    </svg>
+                    <span data-i18n="nav_tech">Technical Audit</span>
+                </button>
+                <button class="nav-item" data-tab="usability">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    <span data-i18n="nav_usability">Usability</span>
+                </button>
+                <button class="nav-item" data-tab="forensics">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    <span data-i18n="nav_forensics">Forensics &amp; Network</span>
+                </button>
+                <button class="nav-item" data-tab="seo-content">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <span data-i18n="nav_seo">SEO &amp; Content</span>
+                </button>
+                <button class="nav-item" data-tab="site-tree">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                    </svg>
+                    <span data-i18n="nav_tree">Structure (Tree)</span>
+                </button>
+                <button class="nav-item" data-tab="score-info">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <span data-i18n="nav_score">How the Score Works</span>
+                </button>
+            </div>
+            <div class="nav-footer">
+                <p data-i18n="footer_built">Built by DotCore</p>
+                <a href="https://dotcore.pt" target="_blank" data-i18n="footer_support">Support</a>
+            </div>
+        </nav>
+
+        <!-- ══ WORKSPACE ════════════════════════════════════ -->
+        <main class="workspace">
+            <header class="workspace-header">
+                <form id="analyze-form" class="search-bar">
+                    <input type="text" id="url-input" data-i18n-placeholder="input_placeholder"
+                        placeholder="https://example.com" required autocomplete="off">
+                    <button type="submit" id="analyze-btn" data-i18n="btn_analyze">Analyse</button>
+                </form>
+                <!-- Lang toggle always visible in header -->
+                <div class="lang-toggle header-lang-toggle">
+                    <button class="lang-btn active" id="lang-pt" onclick="setLang('pt')">PT</button>
+                    <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
+                </div>
+            </header>
+
+            <!-- ── Loading ──────────────────────────────────── -->
+            <div id="loading-state" class="hidden loading-overlay">
+                <div class="spinner-premium"></div>
+                <h2 data-i18n="loading_title">DotCore Deep Audit</h2>
+                <p data-i18n="loading_sub">Analysing network, forensics, SEO, usability and structure...</p>
+            </div>
+
+            <!-- ── Error ────────────────────────────────────── -->
+            <div id="error-state" class="hidden loading-overlay">
+                <div class="logo-fallback-big"
+                    style="background:rgba(184,84,84,0.2);font-size:1.2rem;font-family:'JetBrains Mono',monospace">ERR
+                </div>
+                <h2 style="margin:1.3rem 0 0.4rem" data-i18n="error_title">Analysis Error</h2>
+                <p id="error-message" style="color:var(--text-muted);font-size:0.9rem"></p>
+                <button onclick="location.reload()"
+                    style="margin-top:1.3rem;background:var(--accent);color:white;border:none;padding:0.7rem 1.8rem;border-radius:7px;cursor:pointer;font-family:inherit;font-size:0.88rem"
+                    data-i18n="error_retry">Try Again</button>
+            </div>
+
+            <!-- ══ RESULTS ═══════════════════════════════════ -->
+            <div id="results-container" class="results-container hidden">
+
+                <!-- ─ DASHBOARD ─────────────────────────────── -->
+                <section id="tab-dashboard" class="tab-pane active">
+                    <div class="dashboard-hero">
+                        <div class="hero-main">
+                            <div class="site-branding-big">
+                                <div class="logo-box">
+                                    <img id="site-logo" src="" alt="" class="hidden"
+                                        style="max-width:64px;max-height:64px;border-radius:10px;object-fit:contain">
+                                    <div id="site-logo-fallback" class="logo-fallback-big">?</div>
+                                </div>
+                                <div class="site-meta-big">
+                                    <h1 id="result-url" style="word-break:break-all">—</h1>
+                                    <p id="site-title-display"
+                                        style="color:var(--text-muted);font-size:0.88rem;margin-top:0.2rem">—</p>
+                                </div>
+                            </div>
+                            <div class="main-gauge-container">
+                                <svg viewBox="0 0 36 36" class="circular-chart-big">
+                                    <path class="circle-bg"
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path class="circle" id="score-circle-path" stroke-dasharray="0, 100"
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                </svg>
+                                <div class="gauge-text">
+                                    <span id="huge-score">0</span>
+                                    <small data-i18n="score_label">OVERALL SCORE</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="quick-overview-grid">
+                            <div class="q-item">
+                                <label data-i18n="cat_perf">Performance</label>
+                                <div class="q-bar">
+                                    <div id="bar-perf" style="width:0%"></div>
+                                </div>
+                                <span class="q-val" id="q-val-perf">—</span>
+                            </div>
+                            <div class="q-item">
+                                <label data-i18n="cat_sec">Security</label>
+                                <div class="q-bar">
+                                    <div id="bar-sec" style="width:0%"></div>
+                                </div>
+                                <span class="q-val" id="q-val-sec">—</span>
+                            </div>
+                            <div class="q-item">
+                                <label>SEO</label>
+                                <div class="q-bar">
+                                    <div id="bar-seo" style="width:0%"></div>
+                                </div>
+                                <span class="q-val" id="q-val-seo">—</span>
+                            </div>
+                            <div class="q-item">
+                                <label data-i18n="cat_qual">Quality</label>
+                                <div class="q-bar">
+                                    <div id="bar-qual" style="width:0%"></div>
+                                </div>
+                                <span class="q-val" id="q-val-qual">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dash-three-grid">
+                        <div class="panel">
+                            <h3 style="margin-bottom:0.9rem" data-i18n="tech_detected">Tech Stack Detected</h3>
+                            <div id="tech-tags-list" class="tech-tags-large"></div>
+                        </div>
+                        <div class="panel">
+                            <h3 style="margin-bottom:0.9rem" data-i18n="infrastructure">Infrastructure</h3>
+                            <div class="info-table">
+                                <div class="info-row"><span data-i18n="ip_address">IP Address</span><b
+                                        id="dash-ip">—</b></div>
+                                <div class="info-row"><span data-i18n="geolocation">Geolocation</span><b
+                                        id="dash-geo">—</b></div>
+                                <div class="info-row"><span>WAF / CDN</span><b id="dash-waf">—</b></div>
+                                <div class="info-row"><span>ISP / Org</span><b id="dash-isp">—</b></div>
+                                <div class="info-row"><span>HTTPS</span><b id="dash-https">—</b></div>
+                            </div>
+                        </div>
+                        <div class="panel">
+                            <h3 style="margin-bottom:0.9rem" data-i18n="quick_summary">Quick Summary</h3>
+                            <div class="info-table">
+                                <div class="info-row"><span>TTFB</span><b id="dash-ttfb">—</b></div>
+                                <div class="info-row"><span data-i18n="page_size">Page Size</span><b
+                                        id="dash-size">—</b></div>
+                                <div class="info-row"><span data-i18n="broken_links_lbl">Broken Links</span><b
+                                        id="dash-broken">—</b></div>
+                                <div class="info-row"><span data-i18n="words_lbl">Words</span><b id="dash-words">—</b>
+                                </div>
+                                <div class="info-row"><span>robots.txt</span><b id="dash-robots">—</b></div>
+                                <div class="info-row"><span>sitemap.xml</span><b id="dash-sitemap">—</b></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <h3 style="margin-bottom:1rem" data-i18n="score_by_cat">Score Breakdown by Category</h3>
+                        <div id="score-breakdown-chart" class="score-breakdown-chart"></div>
+                        <p style="margin-top:0.9rem;font-size:0.76rem;color:var(--text-muted)" data-i18n="score_tip">See
+                            "How the Score Works" in the sidebar for full methodology.</p>
+                    </div>
+                </section>
+
+                <!-- ─ AUDIT TECNICA ──────────────────────────── -->
+                <section id="tab-tech-audit" class="tab-pane">
+                    <div class="panel">
+                        <h2 style="margin-bottom:0.4rem" data-i18n="tech_title">Technical Audit</h2>
+                        <p style="color:var(--text-muted);margin-bottom:1.4rem;font-size:0.85rem" data-i18n="tech_sub">
+                            Performance, compression, resources and link quality.</p>
+
+                        <div class="audit-group">
+                            <h3 data-i18n="cat_perf">Performance</h3>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-ttfb"></div>
+                                <div class="audit-details">
+                                    <h4>TTFB <span class="info-icon" data-tooltip="ttfb">[i]</span></h4>
+                                    <p data-i18n="ttfb_desc">Response time until first byte from server. Target:
+                                        &lt;500ms.</p>
+                                </div>
+                                <div class="audit-value" id="val-ttfb">—</div>
+                            </div>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-size"></div>
+                                <div class="audit-details">
+                                    <h4 data-i18n="page_weight">Page Weight <span class="info-icon"
+                                            data-tooltip="pageSize">[i]</span></h4>
+                                    <p data-i18n="page_weight_desc">Total HTML size downloaded. Target: &lt;1500KB.</p>
+                                </div>
+                                <div class="audit-value" id="val-size">—</div>
+                            </div>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-compressed"></div>
+                                <div class="audit-details">
+                                    <h4 data-i18n="compression">HTTP Compression</h4>
+                                    <p data-i18n="compression_desc">Gzip or Brotli enabled on server. Reduces up to 70%
+                                        of transferred size.</p>
+                                </div>
+                                <div class="audit-value" id="val-compressed">—</div>
+                            </div>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-scripts"></div>
+                                <div class="audit-details">
+                                    <h4 data-i18n="js_scripts">JS Scripts</h4>
+                                    <p data-i18n="js_scripts_desc">Number of JavaScript scripts. Above 10 may impact
+                                        load time.</p>
+                                </div>
+                                <div class="audit-value" id="val-scripts">—</div>
+                            </div>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-styles"></div>
+                                <div class="audit-details">
+                                    <h4 data-i18n="css_sheets">CSS Stylesheets</h4>
+                                    <p data-i18n="css_sheets_desc">Number of external CSS files. Above 6 may block
+                                        rendering.</p>
+                                </div>
+                                <div class="audit-value" id="val-styles">—</div>
+                            </div>
+                        </div>
+
+                        <div class="audit-group">
+                            <h3 data-i18n="transport_sec">Transport Security</h3>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-https"></div>
+                                <div class="audit-details">
+                                    <h4>HTTPS</h4>
+                                    <p data-i18n="https_desc">Active TLS/SSL encryption. Essential for security and SEO.
+                                    </p>
+                                </div>
+                                <div class="audit-value" id="val-https">—</div>
+                            </div>
+                        </div>
+
+                        <div class="audit-group">
+                            <h3 data-i18n="links_group">Links <span class="info-icon" data-tooltip="broken">[i]</span>
+                            </h3>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-broken"></div>
+                                <div class="audit-details">
+                                    <h4 data-i18n="broken_links_lbl">Broken Links</h4>
+                                    <p data-i18n="broken_links_desc">Links returning HTTP errors (4xx/5xx). Up to 20
+                                        links checked.</p>
+                                </div>
+                                <div class="audit-value" id="val-broken">—</div>
+                            </div>
+                            <div id="broken-links-container" style="margin-top:0.7rem;padding:0 0.5rem"></div>
+                        </div>
+
+                        <div class="audit-group">
+                            <h3 data-i18n="tech_detail_title">Detected Tech Stack — Detail</h3>
+                            <div class="tech-stack-detail-grid" id="tech-stack-detail"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ─ USABILIDADE ────────────────────────────── -->
+                <section id="tab-usability" class="tab-pane">
+                    <div class="panel">
+                        <h2 style="margin-bottom:0.4rem" data-i18n="usab_title">Usability &amp; Accessibility</h2>
+                        <p style="color:var(--text-muted);margin-bottom:1.4rem;font-size:0.85rem" data-i18n="usab_sub">
+                            In-depth evaluation of structure, accessibility and user experience.</p>
+
+                        <div class="audit-group">
+                            <h3 data-i18n="base_config">Base Configuration</h3>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-lang"></div>
+                                <div class="audit-details">
+                                    <h4 data-i18n="site_lang">Site Language <span class="info-icon"
+                                            data-tooltip="lang">[i]</span></h4>
+                                    <p data-i18n="site_lang_desc"><code>lang</code> attribute on the HTML root. Vital
+                                        for screen readers and multilingual SEO.</p>
+                                </div>
+                                <div class="audit-value" id="val-lang">—</div>
+                            </div>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-viewport"></div>
+                                <div class="audit-details">
+                                    <h4>Viewport Meta</h4>
+                                    <p data-i18n="viewport_desc">Essential for responsiveness on mobile and tablet
+                                        devices.</p>
+                                </div>
+                                <div class="audit-value" id="val-viewport">—</div>
+                            </div>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-charset"></div>
+                                <div class="audit-details">
+                                    <h4>Charset</h4>
+                                    <p data-i18n="charset_desc">Character encoding declared. Recommended: UTF-8.</p>
+                                </div>
+                                <div class="audit-value" id="val-charset">—</div>
+                            </div>
+                        </div>
+
+                        <div class="audit-group">
+                            <h3 data-i18n="accessibility">Accessibility</h3>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-altRatio"></div>
+                                <div class="audit-details">
+                                    <h4 data-i18n="images_alt">Images with Alt <span class="info-icon"
+                                            data-tooltip="alt">[i]</span></h4>
+                                    <p data-i18n="images_alt_desc">Percentage of images with alt attribute. Vital for
+                                        screen readers and image SEO.</p>
+                                </div>
+                                <div class="audit-value" id="val-altRatio">—</div>
+                            </div>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-skiplink"></div>
+                                <div class="audit-details">
+                                    <h4>Skip Link</h4>
+                                    <p data-i18n="skiplink_desc">"Skip to content" link for keyboard and assistive
+                                        technology users.</p>
+                                </div>
+                                <div class="audit-value" id="val-skiplink">—</div>
+                            </div>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-aria"></div>
+                                <div class="audit-details">
+                                    <h4>ARIA <span class="info-icon" data-tooltip="labels">[i]</span></h4>
+                                    <p data-i18n="aria_desc">Interactive elements without ARIA labels. Affects visually
+                                        impaired users.</p>
+                                </div>
+                                <div class="audit-value" id="val-aria">—</div>
+                            </div>
+                            <div class="audit-item">
+                                <div class="audit-status" id="status-forms"></div>
+                                <div class="audit-details">
+                                    <h4 data-i18n="forms">Forms</h4>
+                                    <p data-i18n="forms_desc">Forms with defined method attribute (GET/POST).</p>
+                                </div>
+                                <div class="audit-value" id="val-forms">—</div>
+                            </div>
+                        </div>
+
+                        <div class="audit-group">
+                            <h3 data-i18n="semantic_tags">Semantic Structure <span class="info-icon"
+                                    data-tooltip="semantic">[i]</span></h3>
+                            <p style="font-size:0.76rem;color:var(--text-muted);margin-bottom:0.7rem"
+                                data-i18n="semantic_desc">HTML5 semantic tags improve accessibility and help search
+                                engines understand content.</p>
+                            <div id="semantic-tags-list"
+                                style="display:flex;flex-wrap:wrap;gap:0.4rem;padding:0.8rem 0"></div>
+                        </div>
+
+                        <div class="audit-group">
+                            <h3 data-i18n="readability">Readability Issues</h3>
+                            <p style="font-size:0.76rem;color:var(--text-muted);margin-bottom:0.7rem"
+                                data-i18n="readability_desc">Generic links such as "click here" reduce accessibility and
+                                UX quality.</p>
+                            <div id="readability-issues-list"></div>
+                        </div>
+
+                        <div class="audit-group">
+                            <h3 data-i18n="usab_factors">Scoring Factors — Usability</h3>
+                            <div class="methodology-mini-card">
+                                <div class="mm-item">
+                                    <div class="mm-icon">LG</div>
+                                    <div><strong data-i18n="mm_lang">Language attribute</strong><small
+                                            data-i18n="mm_impact">Impact: -15 pts</small></div>
+                                </div>
+                                <div class="mm-item">
+                                    <div class="mm-icon">VP</div>
+                                    <div><strong data-i18n="mm_vp">Viewport for mobile</strong><small
+                                            data-i18n="mm_impact2">Impact: -15 pts</small></div>
+                                </div>
+                                <div class="mm-item">
+                                    <div class="mm-icon">IM</div>
+                                    <div><strong data-i18n="mm_alt">Image alt &lt;80%</strong><small
+                                            data-i18n="mm_impact3">Impact: -20 pts</small></div>
+                                </div>
+                                <div class="mm-item">
+                                    <div class="mm-icon">SM</div>
+                                    <div><strong data-i18n="mm_sem">Semantic tags &lt;3</strong><small
+                                            data-i18n="mm_impact4">Impact: -15 pts</small></div>
+                                </div>
+                                <div class="mm-item">
+                                    <div class="mm-icon">LK</div>
+                                    <div><strong data-i18n="mm_gen">Generic links</strong><small
+                                            data-i18n="mm_impact5">Impact: -10 pts</small></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ─ FORENSICS & NETWORK ───────────────────── -->
+                <section id="tab-forensics" class="tab-pane">
+                    <div class="dashboard-secondary-grid" style="margin-bottom:1.2rem">
+                        <div class="panel">
+                            <h3 style="margin-bottom:0.8rem" data-i18n="headers_audit">HTTP Headers Audit</h3>
+                            <p style="font-size:0.76rem;color:var(--text-muted);margin-bottom:0.9rem"
+                                data-i18n="headers_desc">HTTP security headers protect against the most common attacks
+                                like XSS, clickjacking and MIME sniffing.</p>
+                            <div id="headers-audit-container" class="headers-audit-list"></div>
+                        </div>
+                        <div class="panel">
+                            <h3 style="margin-bottom:0.9rem" data-i18n="net_dns">Network &amp; DNS</h3>
+                            <div class="info-table" id="dns-details"></div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="margin-bottom:1.2rem">
+                        <h3 style="margin-bottom:0.9rem" data-i18n="sec_score_detail">Security Score — Details</h3>
+                        <div id="security-score-details" class="score-breakdown-chart"></div>
+                    </div>
+
+                    <div id="sensitive-files-alert" class="panel hidden"
+                        style="margin-bottom:1rem;border-color:rgba(184,84,84,0.4);background:rgba(184,84,84,0.04)">
+                        <h3 style="color:var(--error)" data-i18n="alert_sensitive">Sensitive Files Exposed</h3>
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin:0.35rem 0 0.55rem"
+                            data-i18n="alert_sensitive_desc">These files are publicly accessible and may expose
+                            configuration, secrets or source code.</p>
+                        <p id="val-sensitive-list" style="word-break:break-all;font-family:monospace;font-size:0.83rem">
+                        </p>
+                    </div>
+                    <div id="admin-panels-alert" class="panel hidden"
+                        style="margin-bottom:1rem;border-color:rgba(184,147,58,0.4);background:rgba(184,147,58,0.04)">
+                        <h3 style="color:var(--warn)" data-i18n="alert_admin">Admin Panels Accessible</h3>
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin:0.35rem 0 0.55rem"
+                            data-i18n="alert_admin_desc">Admin panels detected publicly. Should be protected by
+                            authentication and ideally restricted by IP.</p>
+                        <p id="val-admin-list" style="word-break:break-all;font-family:monospace;font-size:0.83rem"></p>
+                    </div>
+                    <div id="insecure-cookies-alert" class="panel hidden"
+                        style="margin-bottom:1rem;border-color:rgba(184,147,58,0.4);background:rgba(184,147,58,0.04)">
+                        <h3 style="color:var(--warn)" data-i18n="alert_cookies">Insecure Cookies Detected</h3>
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin:0.35rem 0 0.55rem"
+                            data-i18n="alert_cookies_desc">Cookies without <code>Secure</code> and/or
+                            <code>HttpOnly</code> flags may be intercepted or accessed via malicious JavaScript.
+                        </p>
+                        <p id="val-cookies-list" style="font-family:monospace;font-size:0.83rem"></p>
+                    </div>
+                    <div id="no-threats-badge" class="panel hidden"
+                        style="border-color:rgba(90,158,124,0.35);background:rgba(90,158,124,0.04)">
+                        <h3 style="color:var(--success)" data-i18n="no_threats">No critical threats detected</h3>
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.35rem"
+                            data-i18n="no_threats_desc">No sensitive files exposed, admin panels accessible or insecure
+                            cookies found.</p>
+                    </div>
+                </section>
+
+                <!-- ─ SEO & CONTENT ──────────────────────────── -->
+                <section id="tab-seo-content" class="tab-pane">
+                    <div class="dashboard-secondary-grid" style="margin-bottom:1.2rem">
+                        <div class="panel">
+                            <h3 style="margin-bottom:0.9rem" data-i18n="google_preview">Search Preview (Google)</h3>
+                            <div class="google-result">
+                                <div class="google-header">
+                                    <img id="preview-logo" src="" alt="" class="hidden"
+                                        style="width:20px;height:20px;border-radius:50%;background:white;padding:2px">
+                                    <cite id="preview-url">—</cite>
+                                </div>
+                                <h3 id="preview-title">—</h3>
+                                <p id="preview-desc">—</p>
+                            </div>
+                            <div class="seo-tips" id="seo-quick-tips" style="margin-top:0.8rem"></div>
+                        </div>
+                        <div class="panel">
+                            <h3 style="margin-bottom:0.9rem" data-i18n="content_stats">Content Statistics</h3>
+                            <div class="info-table">
+                                <div class="info-row"><span data-i18n="total_words">Total Words</span><b
+                                        id="val-wordcount">—</b></div>
+                                <div class="info-row"><span>H1 Status</span><b id="val-h1-status">—</b></div>
+                                <div class="info-row"><span data-i18n="images_no_alt">Images without Alt</span><b
+                                        id="val-images-noalt">—</b></div>
+                                <div class="info-row"><span data-i18n="external_links">External Links</span><b
+                                        id="val-external-links">—</b></div>
+                                <div class="info-row"><span>robots.txt</span><b id="val-robots">—</b></div>
+                                <div class="info-row"><span>sitemap.xml</span><b id="val-sitemap">—</b></div>
+                                <div class="info-row"><span>Twitter Card</span><b id="val-twitter-card">—</b></div>
+                                <div class="info-row"><span data-i18n="nofollow_links">Nofollow Links</span><b
+                                        id="val-nofollow">—</b></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="margin-bottom:1.2rem">
+                        <h3 style="margin-bottom:0.8rem">Open Graph &amp; Social</h3>
+                        <p style="font-size:0.76rem;color:var(--text-muted);margin-bottom:0.9rem" data-i18n="og_desc">
+                            Open Graph tags control how the site appears when shared on social networks like Facebook,
+                            LinkedIn and WhatsApp.</p>
+                        <div class="info-table">
+                            <div class="info-row"><span>og:title</span><b id="val-og-title">—</b></div>
+                            <div class="info-row"><span>og:description</span><b id="val-og-desc">—</b></div>
+                            <div class="info-row"><span>og:image</span><b id="val-og-image">—</b></div>
+                            <div class="info-row"><span>twitter:card</span><b id="val-twitter-card-og">—</b></div>
+                            <div class="info-row"><span>twitter:title</span><b id="val-twitter-title">—</b></div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="margin-bottom:1.2rem">
+                        <h3 style="margin-bottom:0.7rem" data-i18n="headings">Heading Structure</h3>
+                        <p style="font-size:0.76rem;color:var(--text-muted);margin-bottom:0.8rem"
+                            data-i18n="headings_desc">A correct heading hierarchy (H1 to H6) improves SEO and
+                            accessibility. There must be exactly 1 H1 per page.</p>
+                        <div class="info-table" id="h-tags-breakdown"></div>
+                    </div>
+
+                    <div class="panel" style="margin-bottom:1.2rem">
+                        <h3 style="margin-bottom:0.9rem" data-i18n="seo_factors">SEO Score Factors</h3>
+                        <div class="methodology-mini-card">
+                            <div class="mm-item">
+                                <div class="mm-icon">TL</div>
+                                <div><strong data-i18n="mm_notitle">No title</strong><small>-20 pts</small></div>
+                            </div>
+                            <div class="mm-item">
+                                <div class="mm-icon">DS</div>
+                                <div><strong data-i18n="mm_nodesc">No meta description</strong><small>-15 pts</small>
+                                </div>
+                            </div>
+                            <div class="mm-item">
+                                <div class="mm-icon">H1</div>
+                                <div><strong data-i18n="mm_badh1">H1 incorrect</strong><small>-15 pts</small></div>
+                            </div>
+                            <div class="mm-item">
+                                <div class="mm-icon">RB</div>
+                                <div><strong data-i18n="mm_norobots">No robots.txt</strong><small>-10 pts</small></div>
+                            </div>
+                            <div class="mm-item">
+                                <div class="mm-icon">SM</div>
+                                <div><strong data-i18n="mm_nomap">No sitemap.xml</strong><small>-10 pts</small></div>
+                            </div>
+                            <div class="mm-item">
+                                <div class="mm-icon">WC</div>
+                                <div><strong data-i18n="mm_words">Content &lt;300 words</strong><small>-10 pts</small>
+                                </div>
+                            </div>
+                            <div class="mm-item">
+                                <div class="mm-icon">OG</div>
+                                <div><strong data-i18n="mm_noog">No og:title</strong><small>-10 pts</small></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <h3 style="margin-bottom:0.8rem" data-i18n="keyword_cloud">Keyword Cloud</h3>
+                        <p style="font-size:0.76rem;color:var(--text-muted);margin-bottom:0.5rem"
+                            data-i18n="keyword_cloud_desc">Most frequent words in the visible page content. Larger words
+                            appear more often.</p>
+                        <div id="keyword-cloud" style="min-height:55px;padding:0.4rem;line-height:2.1"></div>
+                    </div>
+                </section>
+
+                <!-- ─ SITE TREE ──────────────────────────────── -->
+                <section id="tab-site-tree" class="tab-pane">
+                    <div class="panel" style="margin-bottom:1.2rem">
+                        <h2 style="margin-bottom:0.4rem" data-i18n="tree_title">Website Architecture</h2>
+                        <p style="color:var(--text-muted);margin-bottom:1.3rem;font-size:0.85rem" data-i18n="tree_sub">
+                            Directory structure detected from the page's internal links.</p>
+                        <div id="tree-root" class="tree-visual"></div>
+                    </div>
+                    <div class="panel">
+                        <h3 style="margin-bottom:0.7rem" data-i18n="tree_legend">How to read this tree?</h3>
+                        <div class="methodology-mini-card">
+                            <div class="mm-item">
+                                <div class="mm-icon">FD</div>
+                                <div><strong data-i18n="tree_folder">Folder / Section</strong><small
+                                        data-i18n="tree_folder_desc" style="color:var(--text-muted)">A URL path with
+                                        multiple sub-links below it</small></div>
+                            </div>
+                            <div class="mm-item">
+                                <div class="mm-icon">PG</div>
+                                <div><strong data-i18n="tree_page">Page</strong><small data-i18n="tree_page_desc"
+                                        style="color:var(--text-muted)">A final URL with no detected sub-pages</small>
+                                </div>
+                            </div>
+                            <div class="mm-item">
+                                <div class="mm-icon">--</div>
+                                <div><strong data-i18n="tree_empty">Empty tree</strong><small
+                                        data-i18n="tree_empty_desc" style="color:var(--text-muted)">Common in SPAs
+                                        (React, Next.js) where links are generated by JS</small></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ─ HOW THE SCORE WORKS ───────────────────── -->
+                <section id="tab-score-info" class="tab-pane">
+                    <div class="panel" style="margin-bottom:1.2rem">
+                        <h2 style="margin-bottom:0.4rem" data-i18n="score_method_title">How is the DotCore Score
+                            calculated?</h2>
+                        <p style="color:var(--text-muted);margin-bottom:1.2rem;font-size:0.85rem"
+                            data-i18n="score_method_sub">The Overall Score is the arithmetic mean of 5 independent
+                            categories, each with a maximum of 100 points.</p>
+                        <div class="score-formula-box">
+                            <span class="formula-part" data-i18n="cat_perf">Performance</span>
+                            <span class="formula-op">+</span>
+                            <span class="formula-part" data-i18n="cat_sec">Security</span>
+                            <span class="formula-op">+</span>
+                            <span class="formula-part">SEO</span>
+                            <span class="formula-op">+</span>
+                            <span class="formula-part" data-i18n="cat_usab">Usability</span>
+                            <span class="formula-op">+</span>
+                            <span class="formula-part" data-i18n="cat_qual">Quality</span>
+                            <span class="formula-op">/ 5</span>
+                            <span class="formula-result" data-i18n="formula_result">= Overall Score</span>
+                        </div>
+                    </div>
+
+                    <div class="methodology-grid">
+                        <div class="panel method-card">
+                            <div class="method-header">
+                                <div class="method-icon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 data-i18n="cat_perf">Performance</h3><small data-i18n="max_pts">Max: 100
+                                        pts</small>
+                                </div>
+                            </div>
+                            <div class="method-body">
+                                <div class="method-row"><span data-i18n="m_ttfb2000">TTFB &gt; 2000ms</span><b
+                                        class="penalty">-40</b></div>
+                                <div class="method-row"><span data-i18n="m_ttfb800">TTFB 800–2000ms</span><b
+                                        class="penalty">-20</b></div>
+                                <div class="method-row"><span data-i18n="m_nocompression">No compression
+                                        (gzip/brotli)</span><b class="penalty">-20</b></div>
+                                <div class="method-row"><span data-i18n="m_bigpage">Page &gt; 4000KB</span><b
+                                        class="penalty">-20</b></div>
+                            </div>
+                        </div>
+
+                        <div class="panel method-card">
+                            <div class="method-header">
+                                <div class="method-icon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 data-i18n="cat_sec">Security</h3><small data-i18n="max_pts">Max: 100 pts</small>
+                                </div>
+                            </div>
+                            <div class="method-body">
+                                <div class="method-row"><span data-i18n="m_nohttps">No HTTPS</span><b
+                                        class="penalty">-50</b></div>
+                                <div class="method-row"><span data-i18n="m_sensitive">Sensitive files exposed</span><b
+                                        class="penalty">-30</b></div>
+                                <div class="method-row"><span data-i18n="m_admin">Admin panels accessible</span><b
+                                        class="penalty">-20</b></div>
+                                <div class="method-row"><span data-i18n="m_cookies">Insecure cookies</span><b
+                                        class="penalty">-15</b></div>
+                                <div class="method-row"><span data-i18n="m_headers">Missing headers (each)</span><b
+                                        class="penalty">-5 (max -30)</b></div>
+                            </div>
+                        </div>
+
+                        <div class="panel method-card">
+                            <div class="method-header">
+                                <div class="method-icon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <circle cx="11" cy="11" r="8" />
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3>SEO</h3><small data-i18n="max_pts">Max: 100 pts</small>
+                                </div>
+                            </div>
+                            <div class="method-body">
+                                <div class="method-row"><span data-i18n="m_notitle">No title</span><b
+                                        class="penalty">-20</b></div>
+                                <div class="method-row"><span data-i18n="m_nodesc">No meta description</span><b
+                                        class="penalty">-15</b></div>
+                                <div class="method-row"><span data-i18n="m_badh1">H1 incorrect</span><b
+                                        class="penalty">-15</b></div>
+                                <div class="method-row"><span data-i18n="m_norobots">No robots.txt</span><b
+                                        class="penalty">-10</b></div>
+                                <div class="method-row"><span data-i18n="m_nomap">No sitemap.xml</span><b
+                                        class="penalty">-10</b></div>
+                                <div class="method-row"><span data-i18n="m_words">Content &lt;300 words</span><b
+                                        class="penalty">-10</b></div>
+                                <div class="method-row"><span data-i18n="m_noog">No og:title</span><b
+                                        class="penalty">-10</b></div>
+                            </div>
+                        </div>
+
+                        <div class="panel method-card">
+                            <div class="method-header">
+                                <div class="method-icon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                        <circle cx="9" cy="7" r="4" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 data-i18n="cat_usab">Usability</h3><small data-i18n="max_pts">Max: 100
+                                        pts</small>
+                                </div>
+                            </div>
+                            <div class="method-body">
+                                <div class="method-row"><span data-i18n="m_nolang">No lang attribute</span><b
+                                        class="penalty">-15</b></div>
+                                <div class="method-row"><span data-i18n="m_nosem">Semantic tags &lt;3</span><b
+                                        class="penalty">-15</b></div>
+                                <div class="method-row"><span data-i18n="m_altlow">Image alt &lt;80%</span><b
+                                        class="penalty">-20</b></div>
+                                <div class="method-row"><span data-i18n="m_novp">No viewport meta</span><b
+                                        class="penalty">-15</b></div>
+                                <div class="method-row"><span data-i18n="m_genlinks">Generic links</span><b
+                                        class="penalty">-10</b></div>
+                            </div>
+                        </div>
+
+                        <div class="panel method-card">
+                            <div class="method-header">
+                                <div class="method-icon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 data-i18n="cat_qual">Quality</h3><small data-i18n="max_pts">Max: 100 pts</small>
+                                </div>
+                            </div>
+                            <div class="method-body">
+                                <div class="method-row"><span data-i18n="m_brokenlinks">Broken links (each)</span><b
+                                        class="penalty">-8 (max -40)</b></div>
+                                <div class="method-row"><span data-i18n="m_genlinks">Generic links</span><b
+                                        class="penalty">-10</b></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="margin-top:0.5rem">
+                        <h3 style="margin-bottom:0.5rem" data-i18n="compare_title">How to compare with other tools?</h3>
+                        <p style="color:var(--text-muted);font-size:0.83rem;margin-bottom:1.3rem"
+                            data-i18n="compare_desc">Each tool uses a different methodology. The DotCore score does not
+                            replace specialised tools — it is a holistic, quick view. Here is what each one analyses:
+                        </p>
+                        <div class="tools-comparison-grid">
+                            <div class="tool-card">
+                                <div class="tool-logo google">G</div>
+                                <div>
+                                    <strong>Google PageSpeed Insights</strong>
+                                    <small data-i18n="tool_psi">Focus: Real browser rendering performance (Core Web
+                                        Vitals: LCP, CLS, INP). Uses real Chrome user data. Does not analyse security or
+                                        accessibility.</small>
+                                </div>
+                            </div>
+                            <div class="tool-card">
+                                <div class="tool-logo gtmetrix">GT</div>
+                                <div>
+                                    <strong>GTmetrix</strong>
+                                    <small data-i18n="tool_gtm">Focus: Load performance (Waterfall, LCP, TBT). Based on
+                                        Lighthouse + WebPageTest. Does not analyse SEO, security or
+                                        accessibility.</small>
+                                </div>
+                            </div>
+                            <div class="tool-card">
+                                <div class="tool-logo ahrefs">AH</div>
+                                <div>
+                                    <strong>Ahrefs / SEMrush</strong>
+                                    <small data-i18n="tool_ahrefs">Focus: Technical and content SEO, backlinks, keyword
+                                        tracking. Use full crawlers with access to backlink databases. Do not analyse
+                                        live performance.</small>
+                                </div>
+                            </div>
+                            <div class="tool-card">
+                                <div class="tool-logo mozilla">Mz</div>
+                                <div>
+                                    <strong>Mozilla Observatory</strong>
+                                    <small data-i18n="tool_moz">Focus: Security only (HTTP headers, cookies, CSP, HSTS,
+                                        SRI). Identical to our "Security" category. Does not analyse performance, SEO or
+                                        accessibility.</small>
+                                </div>
+                            </div>
+                            <div class="tool-card">
+                                <div class="tool-logo wave">W</div>
+                                <div>
+                                    <strong>WAVE / axe</strong>
+                                    <small data-i18n="tool_wave">Focus: Accessibility (WCAG 2.1). Requires real JS
+                                        rendering. Analyses colour contrast, keyboard navigation, ARIA semantics. Much
+                                        deeper than DotCore in this area.</small>
+                                </div>
+                            </div>
+                            <div class="tool-card tool-card-dotcore">
+                                <div class="tool-logo dotcore">DC</div>
+                                <div>
+                                    <strong>DotCore Analyzer — you are here</strong>
+                                    <small data-i18n="tool_dc">Focus: 360-degree rapid view. Analyses network
+                                        performance, HTTP security, technical SEO, base accessibility, DNS forensics and
+                                        infrastructure — all in one tool, with no account needed across 5
+                                        services.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="margin-top:1rem">
+                        <h3 style="margin-bottom:0.9rem" data-i18n="limits_title">Limitations &amp; Confidence Level
+                        </h3>
+                        <div class="limitations-grid">
+                            <div class="limit-item limit-ok">
+                                <strong data-i18n="conf_high">High confidence</strong>
+                                <ul>
+                                    <li data-i18n="lim1">TTFB measured in real time</li>
+                                    <li data-i18n="lim2">HTTP Headers (exact, from server)</li>
+                                    <li data-i18n="lim3">DNS / IP / Geolocation</li>
+                                    <li data-i18n="lim4">Sensitive file exposure</li>
+                                    <li data-i18n="lim5">SEO meta tags (title, desc, og:*)</li>
+                                    <li data-i18n="lim6">Cookies (Secure/HttpOnly)</li>
+                                </ul>
+                            </div>
+                            <div class="limit-item limit-warn">
+                                <strong data-i18n="conf_med">Medium confidence</strong>
+                                <ul>
+                                    <li data-i18n="lim7">Tech stack detection (based on HTML/header patterns)</li>
+                                    <li data-i18n="lim8">Broken links (limited to 20 links)</li>
+                                    <li data-i18n="lim9">Keyword density (excludes JS-generated content)</li>
+                                    <li data-i18n="lim10">Alt ratio (static HTML images only)</li>
+                                </ul>
+                            </div>
+                            <div class="limit-item limit-error">
+                                <strong data-i18n="conf_none">Not analysed</strong>
+                                <ul>
+                                    <li data-i18n="lim11">Core Web Vitals (LCP, CLS, INP) — requires real browser</li>
+                                    <li data-i18n="lim12">Colour contrast (requires rendering)</li>
+                                    <li data-i18n="lim13">JS-generated content (SPAs)</li>
+                                    <li data-i18n="lim14">Backlinks and domain authority</li>
+                                    <li data-i18n="lim15">Image/video load speed</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div><!-- /results-container -->
+        </main>
+    </div>
+
+    <script src="app.js?v=7"></script>
+</body>
+
+</html>
